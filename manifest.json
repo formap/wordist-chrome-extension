@@ -3,7 +3,7 @@
   "description": "Shows some definitions of the word that you have selected",
   "version": "0.6",
   "permissions": [
-  	"contextMenus"
+  	"contextMenus",
   	"activeTab"
   ],
   "icons": {
