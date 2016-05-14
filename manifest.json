@@ -4,15 +4,32 @@
   "version": "0.6",
   "permissions": [
   	"contextMenus",
-  	"activeTab"
+    "storage",
+  	"activeTab",
+    "tabs",
+    "https://ajax.googleapis.com/"
   ],
   "icons": {
-          "16": "iconBitty16x16.png",
-          "48": "iconSmall48x48.png",
-          "128": "iconLarge128x128.png"
-        },
+    "16": "img/iconBitty16x16.png",
+    "48": "img/iconSmall48x48.png",
+    "128": "img/iconLarge128x128.png"
+  },
   "background": {
-    "scripts": ["definicion.js"]
+    "scripts": ["js/background.js"],
+    "persistent": false
+  },
+  "content_scripts": [{
+    "matches": ["http://*/*", "https://*/*"],
+    "css": ["css/style.css"]
+  }],
+  "commands": {
+    "search-word": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Z",
+        "mac": "MacCtrl+Shift+Z"
+      },
+      "description": "Search word"
+    }
   },
   "manifest_version": 2
 }
