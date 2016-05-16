@@ -6,6 +6,15 @@ var actions = {
   'search-word': 'js/definition.js'
 };
 
+function getActiveTab (callback) {
+  chrome.tabs.query({
+    active: true,
+    lastFocusedWindow: true
+  }, function (tabArray) {
+    callback(tabArray[0]);
+  });
+}
+
 function performCommand (tab, command, callback) {
   if (isLoaded[tab.id]) {
     callback();
@@ -18,13 +27,10 @@ function performCommand (tab, command, callback) {
 }
 
 chrome.commands.onCommand.addListener(function (command) {
-  chrome.tabs.query({
-    active: true,
-    lastFocusedWindow: true
-  }, function (tabArray) {
-    var activeTab = tabArray[0];
-    if (!activeTab) throw new Error("Couldn't find an active tab");
-    performCommand(activeTab, command);
+  getActiveTab(function (tab) {
+    performCommand(tab, command, function() {
+      chrome.tabs.sendMessage(tab.id, {function: 'showPopup'});
+    });
   });
 });
 
@@ -37,21 +43,17 @@ chrome.contextMenus.create({"id": "second-child", "title": "Word history", "cont
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
   switch(info.menuItemId) {
     case 'first-child':
-      chrome.tabs.query({
-        active: true,
-        currentWindow: true
-      }, function(tabArray) {
-        performCommand(tabArray[0], 'search-word', function () {
-          chrome.tabs.sendMessage(tabArray[0].id, {function: 'searchDefinition'})
+      getActiveTab( function(tab) {
+        performCommand(tab, 'search-word', function () {
+          chrome.tabs.sendMessage(tab.id, {function: 'searchDefinition'});
         });
       });
       break;
     case 'second-child':
-      chrome.tabs.query({
-        active: true,
-        currentWindow: true
-      }, function(tabArray) {
-        chrome.tabs.sendMessage(tabArray[0].id, {function: 'showHistory'});
+      getActiveTab( function(tab) {
+        performCommand(tab, 'search-word', function () {
+          chrome.tabs.sendMessage(tab.id, {function: 'showHistory'});
+        });
       });
       break;
     default:

@@ -25,9 +25,10 @@ function showHistory () {
 }
 
 function showPopup () {
+  var selection = document.getSelection();
   var container = document.createElement('div');
-  container.innerHTML = "<p class='searchedWord'> \
-    </p><hr/><p class='wordDefinition'>Loading...</p>";
+  container.innerHTML = "<p class='searchedWord'>" + selection +
+    "</p><hr/><p class='wordDefinition'>Loading...</p>";
   container.className = 'wordist-popup';
   document.body.appendChild(container);
 }
@@ -38,6 +39,8 @@ chrome.runtime.onMessage.addListener(
       searchDefinition();
     } else if (request.function == 'showHistory') {
       showHistory();
+    } else if (request.function == 'showPopup') {
+      showPopup();
     }
   }
 );
