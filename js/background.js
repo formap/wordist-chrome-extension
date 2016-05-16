@@ -45,9 +45,6 @@ function searchDefinition () {
       code: "window.getSelection().toString();"
     }, function(selection) {
       var word = selection[0];
-      console.log("word->", word);
-      //llamar a la api para que devuelva la definicion
-
       var xhr = new XMLHttpRequest();
       xhr.onreadystatechange = function() {
           if (xhr.readyState == XMLHttpRequest.DONE) {
@@ -57,6 +54,7 @@ function searchDefinition () {
               for (var i = 0; i < definitions.length; ++i) {
                 definitionsList.push(definitions[i].definition);
               }
+              //definitionsList have all the definitions
               alert(definitionsList);
           }
       }
