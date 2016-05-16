@@ -10,7 +10,7 @@ function searchDefinition () {
         definitionsList.push(definitions[i].definition);
       }
       //definitionsList have all the definitions
-      alert(definitionsList);
+      //alert(definitionsList);
       showPopup(word, definitionsList);
     }
   }
