@@ -1,13 +1,20 @@
+var isLoaded = {}
+
 /* Keyboard Shortcuts */
 
 var actions = {
   'search-word': 'js/definition.js'
 };
 
-function performCommand (tab, command) {
+function performCommand (tab, command, callback) {
+  if (isLoaded[tab.id]) {
+    callback();
+    return;
+  }
+  isLoaded[tab.id] = true;
   chrome.tabs.executeScript(tab.id, {
     file: actions[command]
-  });
+  }, callback);
 }
 
 chrome.commands.onCommand.addListener(function (command) {
@@ -30,43 +37,24 @@ chrome.contextMenus.create({"id": "second-child", "title": "Word history", "cont
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
   switch(info.menuItemId) {
     case 'first-child':
-      searchDefinition();
+      chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      }, function(tabArray) {
+        performCommand(tabArray[0], 'search-word', function () {
+          chrome.tabs.sendMessage(tabArray[0].id, {function: 'searchDefinition'})
+        });
+      });
       break;
     case 'second-child':
-      showHistory();
+      chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      }, function(tabArray) {
+        chrome.tabs.sendMessage(tabArray[0].id, {function: 'showHistory'});
+      });
       break;
     default:
       console.log('Invalid option');
   }
 });
-
-function searchDefinition () {
-  chrome.tabs.executeScript( {
-      code: "window.getSelection().toString();"
-    }, function(selection) {
-      var word = selection[0];
-      var xhr = new XMLHttpRequest();
-      xhr.onreadystatechange = function() {
-          if (xhr.readyState == XMLHttpRequest.DONE) {
-              var parsedData = JSON.parse(xhr.responseText);
-              var definitions = parsedData.list;
-              var definitionsList = [];
-              for (var i = 0; i < definitions.length; ++i) {
-                definitionsList.push(definitions[i].definition);
-              }
-              //definitionsList have all the definitions
-              alert(definitionsList);
-          }
-      }
-      var url = 'https://mashape-community-urban-dictionary.p.mashape.com/define?term=' + word;
-      xhr.open('GET', url, true);
-      xhr.setRequestHeader("X-Mashape-Key", "bOzAISqPsTmshNicTnIY3HxICaFkp16bplzjsn6qOVxYlKqLCO");
-      xhr.setRequestHeader("Accept", "text/plain");
-      xhr.send(null);
-
-  });
-}
-
-function showHistory () {
-
-}
