@@ -11,6 +11,7 @@ function searchDefinition () {
       }
       //definitionsList have all the definitions
       alert(definitionsList);
+      showPopup(word, definitionsList);
     }
   }
   var url = 'https://mashape-community-urban-dictionary.p.mashape.com/define?term=' + word;
@@ -24,11 +25,15 @@ function showHistory () {
 
 }
 
-function showPopup () {
-  var selection = document.getSelection();
+function showPopup (selection, definitionsList) {
   var container = document.createElement('div');
   container.innerHTML = "<p class='searchedWord'>" + selection +
-    "</p><hr/><p class='wordDefinition'>Loading...</p>";
+    "</p><hr/><p class='wordDefinition'>";
+  for (var i = 0; i < definitionsList.length; ++i) {
+    container.innerHTML += definitionsList[i];
+    container.innerHTML += "<br><br>";
+  }
+  container.innerHTML += "</p>";
   container.className = 'wordist-popup';
   document.body.appendChild(container);
 }
