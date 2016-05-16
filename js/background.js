@@ -45,7 +45,26 @@ function searchDefinition () {
       code: "window.getSelection().toString();"
     }, function(selection) {
       var word = selection[0];
+      console.log("word->", word);
       //llamar a la api para que devuelva la definicion
+
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+          if (xhr.readyState == XMLHttpRequest.DONE) {
+              var parsedData = JSON.parse(xhr.responseText);
+              var definitions = parsedData.list;
+              var definitionsList = [];
+              for (var i = 0; i < definitions.length; ++i) {
+                definitionsList.push(definitions[i].definition);
+              }
+              alert(definitionsList);
+          }
+      }
+      var url = 'https://mashape-community-urban-dictionary.p.mashape.com/define?term=' + word;
+      xhr.open('GET', url, true);
+      xhr.setRequestHeader("X-Mashape-Key", "bOzAISqPsTmshNicTnIY3HxICaFkp16bplzjsn6qOVxYlKqLCO");
+      xhr.setRequestHeader("Accept", "text/plain");
+      xhr.send(null);
 
   });
 }
