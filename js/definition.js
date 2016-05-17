@@ -13,6 +13,7 @@ chrome.runtime.onMessage.addListener(
       var selection = document.getSelection().toString();
       var port = chrome.runtime.connect({name: selection});
       port.onMessage.addListener(function(definition) {
+        console.log("entro igualmente");
         showPopup(selection, definition)
       });
     } else if (request.function == 'showHistory') {

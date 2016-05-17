@@ -10,6 +10,9 @@
   background-color: #eee;
   box-shadow: 5px 5px 2px #ccc;
   z-index: 999;
+  box-shadow:0px 1px 9px #000000;
+  border-radius: 25px;
+  border: 2px solid #eee;
 }
 
 .searchedWord {
@@ -22,6 +25,7 @@
   overflow-y: scroll;
   height: 250px;
   font-color: #444;
+  background-color: #eee;
 }
 
 hr {
