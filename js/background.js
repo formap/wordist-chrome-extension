@@ -45,9 +45,10 @@ function searchDefinition (port, selection) {
       var definitionRe = /<plaintext>([\s\S]*)<\/plaintext>/g;
       var definition = definitionRe.exec(response);
       if (definition == null) {
+        var wikiURL = "https://en.wikipedia.org/wiki/"+selection;
         definition = "Whoops!<br><br>It seems like we couldn't find a definition \
           for that word. You can try clicking on the Wikipedia link below to get more \
-          information.";
+          information.<br><br> <a href="+ wikiURL+">"+ wikiURL+"</a>";
       } else {
         definition = definition[1];
         var parentheses = definition.match(/\([^()]*\)/g);
