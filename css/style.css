@@ -23,10 +23,18 @@
 
 .wordDefinition {
   overflow-y: scroll;
+  background:transparent;
+  background-color: #eee;
   height: 250px;
   font-color: #444;
-  background-color: #eee;
 }
+
+.wordDefinition::-webkit-scrollbar-track-piece
+{
+    background-color: transparent;
+}
+
+
 
 hr {
   color: #000000;
