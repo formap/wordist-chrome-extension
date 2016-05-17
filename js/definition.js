@@ -1,39 +1,35 @@
 function searchDefinition () {
-  var word = document.getSelection();
+  var selection = document.getSelection().toString();
+  /*
+  chrome.runtime.sendMessage({function: 'searchDefinition', parameter: selection});
+  */
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
     if (xhr.readyState == XMLHttpRequest.DONE) {
-      var parsedData = JSON.parse(xhr.responseText);
-      var definitions = parsedData.list;
-      var definitionsList = [];
-      for (var i = 0; i < definitions.length; ++i) {
-        definitionsList.push(definitions[i].definition);
-      }
-      //definitionsList have all the definitions
-      //alert(definitionsList);
-      showPopup(word, definitionsList);
+      var response = JSON.parse(xhr.responseText);
+      console.log(response);
+      var definition = response.AbstractText;
+      showPopup(selection, definition);
     }
   }
-  var url = 'https://mashape-community-urban-dictionary.p.mashape.com/define?term=' + word;
+  var url = 'https://duckduckgo-duckduckgo-zero-click-info.p.mashape.com/?format=json&no_html=1&no_redirect=1&q='
+    + selection + '&skip_disambig=1';
   xhr.open('GET', url, true);
-  xhr.setRequestHeader("X-Mashape-Key", "bOzAISqPsTmshNicTnIY3HxICaFkp16bplzjsn6qOVxYlKqLCO");
+  xhr.setRequestHeader("X-Mashape-Key", "qY2Ooeo8CMmshqxlfaYYgBqx3J9lp1Ckq1YjsnzlAw67ALypVE");
   xhr.setRequestHeader("Accept", "text/plain");
-  xhr.send(null);
+  xhr.send();
 }
+
 
 function showHistory () {
 
 }
 
-function showPopup (selection, definitionsList) {
+function showPopup (selection, definition) {
   var container = document.createElement('div');
+  if (definition == '') definition = 'No definition was found for this word.';
   container.innerHTML = "<p class='searchedWord'>" + selection +
-    "</p><hr/><p class='wordDefinition'>";
-  for (var i = 0; i < definitionsList.length; ++i) {
-    container.innerHTML += definitionsList[i];
-    container.innerHTML += "<br><br>";
-  }
-  container.innerHTML += "</p>";
+    "</p><hr/><p class='wordDefinition'>" + definition + "</p>";
   container.className = 'wordist-popup';
   document.body.appendChild(container);
 }
