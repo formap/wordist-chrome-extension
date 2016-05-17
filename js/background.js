@@ -43,15 +43,22 @@ function searchDefinition (port, selection) {
       var response = xhr.responseText;
       console.log(response);
       var definitionRe = /<plaintext>([\s\S]*)<\/plaintext>/g;
-      var definition = definitionRe.exec(response)[1];
-      var parentheses = definition.match(/\([^()]*\)/g);
-      if (parentheses != null) {
-        var lastParentheses = parentheses.pop();
-        definition = definition.replace(lastParentheses, '');
-      }
-      var sentences = definition.match(/(\d\D+)/g);
-      if (sentences != null) {
-        definition = sentences.join(' <br><br> ');
+      var definition = definitionRe.exec(response);
+      if (definition == null) {
+        definition = "Whoops!<br><br>It seems like we couldn't find a definition \
+          for that word. You can try clicking on the Wikipedia link below to get more \
+          information.";
+      } else {
+        definition = definition[1];
+        var parentheses = definition.match(/\([^()]*\)/g);
+        if (parentheses != null) {
+          var lastParentheses = parentheses.pop();
+          definition = definition.replace(lastParentheses, '');
+        }
+        var sentences = definition.match(/(\d\D+)/g);
+        if (sentences != null) {
+          definition = sentences.join(' <br><br> ');
+        }
       }
       port.postMessage(definition);
     }
