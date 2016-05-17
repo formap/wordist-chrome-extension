@@ -11,3 +11,19 @@
   box-shadow: 5px 5px 2px #ccc;
   z-index: 999;
 }
+
+.searchedWord {
+  font-color: black;
+  font-weight: bolder;
+  font-style: italic;
+}
+
+.wordDefinition {
+  overflow-y: scroll;
+  height: 250px;
+  font-color: #444;
+}
+
+hr {
+  color: #000000;
+}
