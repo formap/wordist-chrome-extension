@@ -44,8 +44,6 @@ chrome.runtime.onMessage.addListener(
       searchDefinition();
     } else if (request.function == 'showHistory') {
       showHistory();
-    } else if (request.function == 'showPopup') {
-      showPopup();
     }
   }
 );

@@ -29,7 +29,7 @@ function performCommand (tab, command, callback) {
 chrome.commands.onCommand.addListener(function (command) {
   getActiveTab(function (tab) {
     performCommand(tab, command, function() {
-      chrome.tabs.sendMessage(tab.id, {function: 'showPopup'});
+      chrome.tabs.sendMessage(tab.id, {function: 'searchDefinition'});
     });
   });
 });
