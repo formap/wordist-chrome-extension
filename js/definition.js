@@ -9,6 +9,14 @@ function showPopup (selection, definition) {
   document.body.appendChild(container);
 }
 
+document.addEventListener('keydown', function (e) {
+  if (e.keyCode == 27) {
+    var element = document.getElementsByClassName('wordist-popup')[0];
+    if (element == null)  return;
+    element.parentNode.removeChild(element);
+  }
+});
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.function == 'searchDefinition') {
