@@ -1,6 +1,6 @@
 {
-  "name": "Dictionary",
-  "description": "Shows some definitions of the word that you have selected",
+  "name": "Wordist",
+  "description": "Dictionary extension that shows information about a selected word",
   "version": "0.6",
   "permissions": [
   	"contextMenus",
