@@ -37,3 +37,34 @@ hr {
   background-color: #888;
   border: none;
 }
+
+.login-popup {
+  text-align: center;
+  padding: 10px;
+}
+
+.login-popup input {
+  margin: 5px;
+}
+
+.login-popup button {
+  width: 90%;
+}
+
+.login-popup #error {
+  margin-top: 3px;
+  color: red;
+}
+
+#sign-in-password {
+  margin-top: 0px;
+}
+
+#register-popup {
+  display: inline-block;
+  margin-top: 5px;
+}
+
+#register-popup a {
+  text-decoration: none;
+}

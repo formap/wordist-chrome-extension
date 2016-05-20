@@ -12,13 +12,20 @@ function getCurrentTabUrl(callback) {
   });
 }
 
+function renderError(errorText) {
+  document.getElementById('error').textContent = errorText;
+}
+
 function loginUser(userData) {
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
     if (xhr.readyState == XMLHttpRequest.DONE) {
+      if (xhr.status != 200) renderError('Incorrect email or password');
       var response = JSON.parse(xhr.responseText);
-      localStorage.setItem('id', response.user._id);
-      localStorage.setItem('token', response.token);
+      localStorage.setItem('wordistId', response.user._id);
+      localStorage.setItem('wordistEmail', response.user.email);
+      localStorage.setItem('wordistToken', response.token);
+      addUserTemplate();
     }
   }
   var url = 'https://wordist-backend.herokuapp.com/auth/login';
@@ -41,11 +48,38 @@ function addSigninListener() {
     }
     var valid = validateData(userData);
     if (valid) loginUser(JSON.stringify(userData));
+    else renderError('Invalid email or password');
   });
+}
+
+function addLoginTemplate() {
+  document.getElementById('popup-template').innerHTML =
+    "<div class='login-popup'> \
+      <span>Sign-in to Wordist:</span> \
+      <div id='error'></div> \
+      <input type='email' placeholder='Email' id='sign-in-email'> \
+      <input type='password' placeholder='Password' id='sign-in-password'> \
+      <button id='sign-in-button'>Sign-in</button> \
+      <span id='register-popup'>Don't have an account?<a href='#'>Sign-up</a> \
+    </div>";
+}
+
+function addUserTemplate() {
+  var email = localStorage.getItem('wordistEmail');
+  document.getElementById('popup-template').innerHTML =
+    "<div class='logged-popup'> \
+      <span>Welcome to wordist <span id='userName'>" + email + "</span>!</span> \
+    </div>";
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   getCurrentTabUrl(function(url) {
-    addSigninListener();
+    var token = localStorage.getItem('wordistToken');
+    if (!token) {
+      addLoginTemplate();
+      addSigninListener();
+    } else {
+      addUserTemplate(token);
+    }
   });
 });
