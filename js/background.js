@@ -36,6 +36,27 @@ chrome.commands.onCommand.addListener(function (command) {
 
 /* Context Menu */
 
+function saveToUser (selection, definition, token) {
+  var data = {
+    word: selection,
+    definition: definition
+  }
+  var userId = localStorage.getItem('wordistId');
+  token = 'Bearer ' + token;
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+      if (xhr.status != 200) console.log('Error while saving word to user');
+      console.log('Successfully saved word to user');
+    }
+  }
+  var url = 'https://wordist-backend.herokuapp.com/users/' + userId + '/words';
+  xhr.open('POST', url, true);
+  xhr.setRequestHeader('Content-type', 'application/json');
+  xhr.setRequestHeader('Authorization', token);
+  xhr.send(JSON.stringify(data));
+}
+
 function searchDefinition (port, selection) {
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
@@ -60,6 +81,8 @@ function searchDefinition (port, selection) {
           definition = sentences.join(' <br><br> ');
         }
       }
+      var token = localStorage.getItem('wordistToken');
+      if (token) saveToUser(selection, definition, token);
       port.postMessage(definition);
     }
   }
@@ -97,6 +120,5 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
 });
 
 chrome.runtime.onConnect.addListener(function(port) {
-  console.log('port selection ', port);
   searchDefinition(port, port.name);
 });

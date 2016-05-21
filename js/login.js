@@ -31,7 +31,7 @@ function loginUser(userData) {
   var url = 'https://wordist-backend.herokuapp.com/auth/login';
   xhr.open('POST', url, true);
   xhr.setRequestHeader('Content-type', 'application/json');
-  xhr.send(userData);
+  xhr.send(JSON.stringify(userData));
 }
 
 function validateData(userData) {
@@ -47,7 +47,7 @@ function addSigninListener() {
       password: document.getElementById('sign-in-password').value
     }
     var valid = validateData(userData);
-    if (valid) loginUser(JSON.stringify(userData));
+    if (valid) loginUser(userData);
     else renderError('Invalid email or password');
   });
 }
