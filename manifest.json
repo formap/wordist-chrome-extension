@@ -9,6 +9,11 @@
     "tabs",
     "https://ajax.googleapis.com/"
   ],
+  "applications": {
+    "gecko": {
+      "id": "1234ff@wordist.com"
+    }
+  },
   "icons": {
     "16": "img/iconBitty16x16.png",
     "48": "img/iconSmall48x48.png",
