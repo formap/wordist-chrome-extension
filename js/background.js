@@ -1,7 +1,6 @@
-var isLoaded = {}
+var isLoaded = {};
+var wordData = {};
 var responses = 0;
-var wolframResult;
-var wordnikResult;
 
 /* Keyboard Shortcuts */
 
@@ -60,39 +59,40 @@ function saveToUser (selection, definition, token) {
   xhr.send(JSON.stringify(data));
 }
 
-function searchInWolfram(port, selection) {
+function searchExample(port, selection) {
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
     if (xhr.readyState == XMLHttpRequest.DONE) {
-      var response = xhr.responseText;
-      var wordData = {};
-      var definitionRe = /<plaintext>([\s\S]*)<\/plaintext>/g;
-      wordData.definition = definitionRe.exec(response);
-      if (wordData.definition == null) {
-        wordData.definition = "Whoops!<br><br>It seems like we couldn't find a definition \
-          for that word. You can try clicking on the Wikipedia link below to get more \
-          information.";
-        wordData.error = true;
-      } else {
-        wordData.definition = wordData.definition[1];
-        var parentheses = wordData.definition.match(/\([^()]*\)/g);
-        if (parentheses != null) {
-          var lastParentheses = parentheses.pop();
-          wordData.definition = wordData.definition.replace(lastParentheses, '');
-        }
-        var sentences = wordData.definition.match(/(\d\D+)/g);
-        if (sentences != null) {
-          wordData.definition = sentences.join(' <br><br> ');
-        }
-        wordData.error = false;
+      var response = JSON.parse(xhr.responseText);
+      wordData.example = '';
+      if (response != null && response.text != null && response.text != undefined) {
+        wordData.example = response.text;
       }
       responses += 1;
-      wolframResult = wordData;
-      if (responses == 2) sendResponse(port, selection);
+      if (responses == 3) sendResponse(port, selection);
     }
   }
-  var url = 'http://api.wolframalpha.com/v2/query?appid=LJ95GY-EH7LLL579U&input='
-    + selection + '&format=plaintext&includepodid=Definition:WordData';
+  var url = 'http://api.wordnik.com:80/v4/word.json/' + selection +
+    '/topExample?useCanonical=false&api_key=2cb81415758e37f066b0d0454ff0ff31d6867179a2d64b633'
+  xhr.open('GET', url, true);
+  xhr.send();
+}
+
+function searchPronunciation(port, selection) {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+      var response = JSON.parse(xhr.responseText);
+      wordData.pronunciation = '';
+      if (response.length > 0) {
+        wordData.pronunciation = response[0].raw;
+      }
+      responses += 1;
+      if (responses == 3) sendResponse(port, selection);
+    }
+  }
+  var url = 'http://api.wordnik.com:80/v4/word.json/' + selection +
+    '/pronunciations?useCanonical=false&limit=1&api_key=2cb81415758e37f066b0d0454ff0ff31d6867179a2d64b633';
   xhr.open('GET', url, true);
   xhr.send();
 }
@@ -102,17 +102,18 @@ function searchInWordnik(port, selection) {
   xhr.onreadystatechange = function() {
     if (xhr.readyState == XMLHttpRequest.DONE) {
       var response = JSON.parse(xhr.responseText);
-      var wordData = {};
       if (response.length > 0) {
         wordData.definition = response[0].text;
         wordData.partOfSpeech = response[0].partOfSpeech;
         wordData.error = false;
       } else {
+        wordData.definition = "Whoops!<br><br>It seems like we couldn't find a definition \
+          for that word. You can try clicking on the Wikipedia link below to get more \
+          information.";
         wordData.error = true;
       }
       responses += 1;
-      wordnikResult = wordData;
-      if (responses == 2) sendResponse(port, selection);
+      if (responses == 3) sendResponse(port, selection);
     }
   }
   var url = 'http://api.wordnik.com:80/v4/word.json/' + selection +
@@ -123,21 +124,17 @@ function searchInWordnik(port, selection) {
 }
 
 function sendResponse(port, selection) {
-  var definition = wolframResult.definition;
-  if (wolframResult.error && !wordnikResult.error) {
-    definition = wordnikResult.definition;
-  }
   var token = localStorage.getItem('wordistToken');
-  var error = wolframResult.error && wordnikResult.error;
-  if (token && !error) saveToUser(selection, definition, token);
-  port.postMessage(definition);
-  wolframResult = wordnikResult = {};
+  if (token && !wordData.error) saveToUser(selection, wordData.definition, token);
+  port.postMessage(wordData);
+  wordData = {};
   responses = 0;
 }
 
 function searchDefinition(port, selection) {
-  searchInWolfram(port, selection);
   searchInWordnik(port, selection);
+  searchPronunciation(port, selection);
+  searchExample(port, selection);
 }
 
 chrome.contextMenus.create({"id": "parent", "title": "Look up word", "contexts": ["selection"]});

@@ -21,6 +21,11 @@
   font-style: italic;
 }
 
+#wordPronunciation {
+  margin-left: 10px;
+  color: #888;
+}
+
 .wordDefinition {
   max-height: 280px;
   overflow-y: scroll;
@@ -30,6 +35,11 @@
 
 .wordDefinition a {
   text-decoration: none;
+}
+
+#wordExample {
+  font-style: italic;
+  color: #888;
 }
 
 hr {
@@ -58,7 +68,7 @@ hr {
 
 .logged-popup {
   text-align: center;
-  
+
 }
 
 #view-history-button, #sign-out-button {

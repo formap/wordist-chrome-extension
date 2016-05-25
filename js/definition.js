@@ -1,8 +1,9 @@
-function showPopup (selection, definition) {
+function showPopup (selection, wordData) {
   var container = document.createElement('div');
-  if (definition == '') definition = 'No definition was found for this word.';
-  container.innerHTML = "<p class='searchedWord'>" + selection +
-    "</p><hr/><p class='wordDefinition'>" + definition + "<br><br>  \
+  container.innerHTML = "<span class='searchedWord'>" + selection +
+    "</span><span id='wordPronunciation'>" + wordData.pronunciation + "</span><hr/> \
+    <p class='wordDefinition'>" + wordData.definition + "<br><br>  \
+    <span id='wordExample'>" + wordData.example + "</span><br><br> \
     <a target='_blank' href=https://en.wikipedia.org/wiki/" + selection +
     ">Search " + selection + " on Wikipedia</a>";
   container.className = 'wordist-popup';
