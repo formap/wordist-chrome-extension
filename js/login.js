@@ -52,6 +52,18 @@ function addSigninListener() {
   });
 }
 
+function addSignedInListeners() {
+  document.getElementById('view-history-button').addEventListener('click', function (e) {
+    var wind = window.open('http://localhost:8080/#/home', '_blank');
+    if (wind) wind.focus();
+  });
+
+  document.getElementById('sign-out-button').addEventListener('click', function (e) {
+    localStorage.removeItem('wordistToken');
+    window.close();
+  });
+}
+
 function addLoginTemplate() {
   document.getElementById('popup-template').innerHTML =
     "<div class='login-popup'> \
@@ -60,7 +72,7 @@ function addLoginTemplate() {
       <input type='email' placeholder='Email' id='sign-in-email'> \
       <input type='password' placeholder='Password' id='sign-in-password'> \
       <button id='sign-in-button'>Sign-in</button> \
-      <span id='register-popup'>Don't have an account?<a href='#'>Sign-up</a> \
+      <span id='register-popup'>Don't have an account?<a href='https://localhost:8080/'>Sign-up</a> \
     </div>";
 }
 
@@ -69,6 +81,8 @@ function addUserTemplate() {
   document.getElementById('popup-template').innerHTML =
     "<div class='logged-popup'> \
       <span>Welcome to wordist <span id='userName'>" + email + "</span>!</span> \
+      <button id='view-history-button'>View history</button> \
+      <button id='sign-out-button'>Sign-out</button> \
     </div>";
 }
 
@@ -80,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
       addSigninListener();
     } else {
       addUserTemplate(token);
+      addSignedInListeners();
     }
   });
 });

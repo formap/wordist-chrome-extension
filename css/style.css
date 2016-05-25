@@ -38,7 +38,7 @@ hr {
   border: none;
 }
 
-.login-popup {
+.popup-template {
   text-align: center;
   padding: 10px;
 }
@@ -54,6 +54,16 @@ hr {
 .login-popup #error {
   margin-top: 3px;
   color: red;
+}
+
+.logged-popup {
+  text-align: center;
+  
+}
+
+#view-history-button, #sign-out-button {
+  width: 90%;
+  margin-top: 5px;
 }
 
 #sign-in-password {
