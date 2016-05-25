@@ -1,4 +1,7 @@
 var isLoaded = {}
+var responses = 0;
+var wolframResult;
+var wordnikResult;
 
 /* Keyboard Shortcuts */
 
@@ -57,39 +60,84 @@ function saveToUser (selection, definition, token) {
   xhr.send(JSON.stringify(data));
 }
 
-function searchDefinition (port, selection) {
+function searchInWolfram(port, selection) {
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
     if (xhr.readyState == XMLHttpRequest.DONE) {
       var response = xhr.responseText;
-      console.log(response);
+      var wordData = {};
       var definitionRe = /<plaintext>([\s\S]*)<\/plaintext>/g;
-      var definition = definitionRe.exec(response);
-      if (definition == null) {
-        definition = "Whoops!<br><br>It seems like we couldn't find a definition \
+      wordData.definition = definitionRe.exec(response);
+      if (wordData.definition == null) {
+        wordData.definition = "Whoops!<br><br>It seems like we couldn't find a definition \
           for that word. You can try clicking on the Wikipedia link below to get more \
           information.";
+        wordData.error = true;
       } else {
-        definition = definition[1];
-        var parentheses = definition.match(/\([^()]*\)/g);
+        wordData.definition = wordData.definition[1];
+        var parentheses = wordData.definition.match(/\([^()]*\)/g);
         if (parentheses != null) {
           var lastParentheses = parentheses.pop();
-          definition = definition.replace(lastParentheses, '');
+          wordData.definition = wordData.definition.replace(lastParentheses, '');
         }
-        var sentences = definition.match(/(\d\D+)/g);
+        var sentences = wordData.definition.match(/(\d\D+)/g);
         if (sentences != null) {
-          definition = sentences.join(' <br><br> ');
+          wordData.definition = sentences.join(' <br><br> ');
         }
+        wordData.error = false;
       }
-      var token = localStorage.getItem('wordistToken');
-      if (token) saveToUser(selection, definition, token);
-      port.postMessage(definition);
+      responses += 1;
+      wolframResult = wordData;
+      if (responses == 2) sendResponse(port, selection);
     }
   }
   var url = 'http://api.wolframalpha.com/v2/query?appid=LJ95GY-EH7LLL579U&input='
     + selection + '&format=plaintext&includepodid=Definition:WordData';
   xhr.open('GET', url, true);
   xhr.send();
+}
+
+function searchInWordnik(port, selection) {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+      var response = JSON.parse(xhr.responseText);
+      var wordData = {};
+      if (response.length > 0) {
+        wordData.definition = response[0].text;
+        wordData.partOfSpeech = response[0].partOfSpeech;
+        wordData.error = false;
+      } else {
+        wordData.error = true;
+      }
+      responses += 1;
+      wordnikResult = wordData;
+      if (responses == 2) sendResponse(port, selection);
+    }
+  }
+  var url = 'http://api.wordnik.com:80/v4/word.json/' + selection +
+    '/definitions?limit=1&includeRelated=false&useCanonical=true&includeTags=false \
+    &api_key=2cb81415758e37f066b0d0454ff0ff31d6867179a2d64b633';
+  xhr.open('GET', url, true);
+  xhr.send();
+}
+
+function sendResponse(port, selection) {
+  var definition = wolframResult.definition;
+  if (wolframResult.error && !wordnikResult.error) {
+    definition = wordnikResult.definition;
+  }
+  var token = localStorage.getItem('wordistToken');
+  var error = wolframResult.error && wordnikResult.error;
+  if (token && !error) saveToUser(selection, definition, token);
+  port.postMessage(definition);
+  wolframResult = wordnikResult = {};
+  responses = 0;
+}
+
+function searchDefinition(port, selection) {
+  searchInWolfram(port, selection);
+  searchInWordnik(port, selection);
 }
 
 chrome.contextMenus.create({"id": "parent", "title": "Look up word", "contexts": ["selection"]});
